@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+    <link rel="stylesheet" href="./stylesheet.css">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="description" content="Data Visualisation"/>
+    <meta name="keywords" content="HTML, CSS, D3"/>
+    <meta name="author" content="Zhen Yu"/>
+
+    <title>Task 2.1 D3 Data Binding</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+
+<body>
+    
+    
+	<button class="button-1" onclick="window.location.href='lab2.1.html'">Lab 2.1</button>
+	<button class="button-1" onclick="window.location.href='lab2.2.html'">Lab 2.2</button>
+	<button class="button-1" onclick="window.location.href='lab2.3.html'">Lab 2.3</button>
+    <button class="button-1" onclick="window.location.href='lab2-4.html'">Lab 2.4</button>
+<h1>Data Binding</h1>
+ <!--   <script>
+        var dataset = [14,5,26,23,9];
+        d3.select("body").selectAll("p")
+            .data(dataset)
+            .enter()
+            .append("p")
+            .text("New Paragraph!")
+    </script>
+-->
+<!--    <script>
+        var dataset = [14,5,26,23,9];
+        d3.select("body").selectAll("p")
+            .data(dataset)
+            .enter()
+            .append("p")
+            .text(function(d) {
+                return d;
+            });
+            
+    </script>-->
+
+    <!--<script>
+        var dataset = [14,5,26,23,9];
+        d3.select("body").selectAll("p")
+            .data(dataset)
+            .enter()
+            .append("p")
+            .style(color,function(d){
+                if (d>10){
+                    return "red"
+                }
+            })
+            .text(function(d) {
+                if (d>10){
+                    return"Warning: Joe watched" + d + "cat videos today.";
+                }else{
+                    return "Joe watched" + d + "cat videos today."
+                }
+                });
+                console.log(d3.selectAll("p"));
+
+            
+    </script>
+-->
+    <script>
+        var dataset = [14, 5, 26, 23, 9];
+
+        d3.select("body").selectAll("p")
+        .data(dataset)
+        .enter()
+        .append("p")
+        .text(function(i){
+            var retn = "";
+        if (i > 10) {
+        retn = "Warning: "
+        }
+        return retn + "Joe watched " + i + " cat videos today."
+        }).style("color", function(d) {
+        if (d > 10) {
+        return "red";
+        }
+    });
+    </script>
+    
+</body>
+<footer style ="color: rgb(59, 58, 58);"> COS30045 DATA visualisation<br>Cheong Zi Shan</footer>
+</html>
