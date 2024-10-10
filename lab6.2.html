@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="description" content="Data Visualisation"/>
+    <meta name="keywords" content="HTML, CSS, D3"/>
+    <meta name="author" content="Zi Shan"/>
+    <title>Bar Chart with Mouse Over and Sort</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="lab6.2.json" defer></script>
+    <style>
+        #button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        button {
+            margin: 0 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="button-1" onclick="window.location.href='lab6.1.html'">Lab 6.1</button>
+    <button class="button-1" onclick="window.location.href='lab6.2.html'">Lab 6.2</button>
+    <br>
+    <button id="addBtn" style="background-color: #007bff; color: white;">Add</button>
+    <button id="removeBtn" style="background-color: #ff851b; color: white;">Remove</button>
+    <button id="sortBtn" style="background-color: #2ecc71; color: white;">Sort</button>
+
+    <h1>Bar Chart with Mouse Over and Sort</h1>
+
+    <svg></svg>
+
+    <footer style="color:grey; margin-top: 20px;">
+        COS30045 Data Visualisation <br> Cheong Zi Shan
+    </footer>
+</body>
+</html>

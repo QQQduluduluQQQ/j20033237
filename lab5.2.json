@@ -1,0 +1,103 @@
+// Define the dataset inside the JavaScript file
+var data = {
+    "dataset": [14, 5, 26, 23, 9, 12, 19, 22, 15]
+};
+
+// Set width and height
+var w = 500;
+var h = 300;
+var barPadding = 3;
+var maxValue = 25;  // Max value for randomly generated numbers
+
+// Create SVG element
+var svg = d3.select("svg")
+    .attr("width", w)
+    .attr("height", h);
+
+// Create xScale using scaleBand with padding and rounding
+var xScale = d3.scaleBand()
+    .rangeRound([0, w])  // Round the width to whole numbers
+    .paddingInner(0.05);  // Add padding between bars
+
+// Create yScale using scaleLinear for continuous data
+var yScale = d3.scaleLinear()
+    .range([h, 0]);  // Invert the range to make it suitable for an SVG
+
+// Initialize the chart using the dataset from the `data` object
+var dataset = data.dataset;
+
+// Set xScale domain based on the number of elements in the dataset
+xScale.domain(d3.range(dataset.length));
+
+// Set yScale domain based on the max value in the dataset
+yScale.domain([0, d3.max(dataset)]);
+
+// Draw initial bars
+svg.selectAll("rect")
+    .data(dataset)
+    .enter()
+    .append("rect")
+    .attr("x", function(d, i) {
+        return xScale(i);  // Use the xScale for the position
+    })
+    .attr("y", function(d) {
+        return yScale(d);  // Set y position relative to the value using yScale
+    })
+    .attr("width", xScale.bandwidth())  // Use the rounded bandwidth
+    .attr("height", function(d) {
+        return h - yScale(d);  // Calculate height using yScale
+    })
+    .attr("fill", "rgb(106, 90, 205)");
+
+// Add x-axis and y-axis
+var xAxis = d3.axisBottom(xScale);
+var yAxis = d3.axisLeft(yScale);
+
+// Append x-axis
+svg.append("g")
+    .attr("class", "x-axis")
+    .attr("transform", "translate(0," + h + ")")
+    .call(xAxis);
+
+// Append y-axis
+svg.append("g")
+    .attr("class", "y-axis")
+    .call(yAxis);
+
+// Function to update the chart with new data and apply transitions
+function updateChart() {
+    // Generate new random data (up to 25 bars)
+    var numValues = dataset.length;  // Keep the number of bars consistent
+    dataset = [];  // Clear the dataset
+
+    for (var i = 0; i < numValues; i++) {
+        var newNumber = Math.floor(Math.random() * maxValue);
+        dataset.push(newNumber);
+    }
+
+    // Update yScale domain with the new data
+    yScale.domain([0, d3.max(dataset)]);
+
+    // Add transition for smoother updates
+    svg.selectAll("rect")
+        .data(dataset)
+        .transition()  // Smooth transition
+        .duration(1000)  // Duration of the transition
+        .ease(d3.easeCubicInOut)  // Easing function
+        .attr("y", function(d) {
+            return yScale(d);  // Update y position relative to new data
+        })
+        .attr("height", function(d) {
+            return h - yScale(d);  // Update height based on new data
+        });
+
+    // Update y-axis with new scale
+    svg.select(".y-axis")
+        .transition()  // Apply transition to the y-axis
+        .duration(1000)
+        .ease(d3.easeCubicInOut)
+        .call(yAxis);
+}
+
+// Add event listener to the "Update" button
+d3.select("#updateBtn").on("click", updateChart);

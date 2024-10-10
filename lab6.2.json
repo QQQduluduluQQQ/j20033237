@@ -1,0 +1,212 @@
+// Define the dataset inside the JavaScript file
+var data = {
+    "dataset": [14, 5, 26, 23, 9, 12, 19, 22, 15]
+};
+
+// Set width and height
+var w = 500;
+var h = 300;
+var barPadding = 0.1; // Small padding between bars
+var maxValue = 25;  // Max value for randomly generated numbers
+
+// Create SVG element
+var svg = d3.select("svg")
+    .attr("width", w)
+    .attr("height", h);
+
+// Create xScale using scaleBand with padding
+var xScale = d3.scaleBand()
+    .range([0, w])  // Full width
+    .paddingInner(barPadding);  // Adjust padding between bars
+
+// Create yScale using scaleLinear for continuous data
+var yScale = d3.scaleLinear()
+    .range([h, 0]);  // Invert the range to make it suitable for an SVG
+
+// Initialize the chart using the dataset from the `data` object
+var dataset = data.dataset;
+var sortOrder = false; // To toggle between ascending and descending sort
+
+// Set xScale domain based on the number of elements in the dataset
+xScale.domain(d3.range(dataset.length));
+
+// Set yScale domain based on the max value in the dataset
+yScale.domain([0, d3.max(dataset)]);
+
+// Draw initial bars
+svg.selectAll("rect")
+    .data(dataset)
+    .enter()
+    .append("rect")
+    .attr("x", function(d, i) {
+        return xScale(i);  // Use the xScale for the position
+    })
+    .attr("y", function(d) {
+        return yScale(d);  // Set y position relative to the value using yScale
+    })
+    .attr("width", xScale.bandwidth())  // Use the rounded bandwidth
+    .attr("height", function(d) {
+        return h - yScale(d);  // Calculate height using yScale
+    })
+    .attr("fill", "slategrey")
+    // Add mouseover event for the SVG tooltip
+    .on("mouseover", function(event, d) {
+        var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.bandwidth() / 2;
+        var yPosition = parseFloat(d3.select(this).attr("y")) - 10;
+
+        svg.append("text")
+            .attr("id", "tooltip")
+            .attr("x", xPosition)
+            .attr("y", yPosition)
+            .attr("text-anchor", "middle")
+            .attr("font-size", "12px")
+            .attr("fill", "black")
+            .text(d);
+
+        d3.select(this)
+            .transition()
+            .duration(200)
+            .attr("fill", "orange");
+    })
+    .on("mouseout", function() {
+        d3.select("#tooltip").remove();
+        d3.select(this)
+            .transition()
+            .duration(200)
+            .attr("fill", "slategrey");
+    });
+
+// Add x-axis and y-axis
+var xAxis = d3.axisBottom(xScale);
+var yAxis = d3.axisLeft(yScale);
+
+// Append x-axis
+svg.append("g")
+    .attr("class", "x-axis")
+    .attr("transform", "translate(0," + h + ")")
+    .call(xAxis);
+
+// Append y-axis
+svg.append("g")
+    .attr("class", "y-axis")
+    .call(yAxis);
+
+// Function to update the chart with new data
+function updateChart() {
+    // Update xScale and yScale domains
+    xScale.domain(d3.range(dataset.length));
+    yScale.domain([0, d3.max(dataset)]);
+
+    // Update the bars
+    var bars = svg.selectAll("rect")
+        .data(dataset);
+
+    // Enter new bars if needed
+    bars.enter()
+        .append("rect")
+        .attr("x", w) // Start new bars at the far right, outside the view
+        .attr("y", function(d) {
+            return yScale(d);
+        })
+        .attr("width", xScale.bandwidth())
+        .attr("height", function(d) {
+            return h - yScale(d);
+        })
+        .attr("fill", "slategrey")
+        .on("mouseover", function(event, d) {
+            var xPosition = parseFloat(d3.select(this).attr("x")) + xScale.bandwidth() / 2;
+            var yPosition = parseFloat(d3.select(this).attr("y")) - 10;
+
+            svg.append("text")
+                .attr("id", "tooltip")
+                .attr("x", xPosition)
+                .attr("y", yPosition)
+                .attr("text-anchor", "middle")
+                .attr("font-size", "12px")
+                .attr("fill", "black")
+                .text(d);
+
+            d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("fill", "orange");
+        })
+        .on("mouseout", function() {
+            d3.select("#tooltip").remove();
+            d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("fill", "slategrey");
+        })
+        .merge(bars)  // Merge with existing bars
+        .transition()  // Transition for smooth updates
+        .duration(500)
+        .attr("x", function(d, i) {
+            return xScale(i);  // Update x position with the new xScale
+        })
+        .attr("y", function(d) {
+            return yScale(d);  // Update y position relative to new data
+        })
+        .attr("height", function(d) {
+            return h - yScale(d);  // Update height based on new data
+        });
+
+    // Exit any bars that are no longer needed
+    bars.exit()
+        .transition()
+        .duration(500)
+        .attr("x", w)
+        .remove();
+
+    // Update the axes with the new scales
+    svg.select(".x-axis")
+        .transition()
+        .duration(500)
+        .call(xAxis);
+
+    svg.select(".y-axis")
+        .transition()
+        .duration(500)
+        .call(yAxis);
+}
+
+// Function to add a new value
+function addData() {
+    var newNumber = Math.floor(Math.random() * maxValue);
+    dataset.push(newNumber);
+    updateChart();
+}
+
+// Function to remove the first value
+function removeData() {
+    dataset.shift();
+    updateChart();
+}
+
+// Function to sort the bars
+function sortBars() {
+    // Toggle the sort order
+    sortOrder = !sortOrder;
+
+    // Sort the dataset based on the sort order
+    dataset.sort(function(a, b) {
+        return sortOrder ? d3.ascending(a, b) : d3.descending(a, b);
+    });
+
+    // Update the xScale to match the sorted data
+    xScale.domain(d3.range(dataset.length));
+
+    // Redraw the bars with a transition
+    svg.selectAll("rect")
+        .data(dataset)
+        .transition()
+        .duration(1000)
+        .attr("x", function(d, i) {
+            return xScale(i);
+        });
+}
+
+// Add event listeners for the "Add", "Remove", and "Sort" buttons
+d3.select("#addBtn").on("click", addData);
+d3.select("#removeBtn").on("click", removeData);
+d3.select("#sortBtn").on("click", sortBars);

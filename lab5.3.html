@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="description" content="Data Visualisation"/>
+    <meta name="keywords" content="HTML, CSS, D3"/>
+    <meta name="author" content="Zi Shan"/>
+    <title>Lab 5.3 D3 Adding and Removing Data - Bar Chart</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="lab5.3.json" defer></script> <!-- Link to external JS file -->
+    <style>
+        /* Add some spacing and centering */
+        #button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="button-1" onclick="window.location.href='lab5.1.html'">Lab 5.1</button>
+    <button class="button-1" onclick="window.location.href='lab5.2.html'">Lab 5.2</button>
+    <button class="button-1" onclick="window.location.href='lab5.3.html'">Lab 5.3</button>
+
+    <h1>Lab 5.3: Adding and Removing Data</h1>
+
+    <!-- SVG element for D3 visualisation -->
+    <svg></svg>
+
+    <!-- Move the buttons into their own container below the chart -->
+    <div id="button-container">
+        <button id="addBtn">Add Data</button>
+        <button id="removeBtn">Remove Data</button>
+    </div>
+
+    <footer style="color:grey; margin-top: 20px;">
+        COS30045 Data Visualisation <br> Cheong Zi Shan
+    </footer>
+</body>
+</html>
