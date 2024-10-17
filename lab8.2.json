@@ -1,0 +1,78 @@
+// Set up SVG dimensions
+var w = 600;
+var h = 600;
+
+// Define the SVG element
+var svg = d3.select("svg")
+    .attr("width", w)
+    .attr("height", h);
+
+// Define a Mercator projection
+var projection = d3.geoMercator()
+    .center([145, -36.5]) // Center it around Victoria
+    .translate([w / 2, h / 2]) // Move the map to the center of the SVG
+    .scale(2450); // Adjust the scale for a good fit
+
+// Define a path generator using the projection
+var path = d3.geoPath().projection(projection);
+
+// Load the CSV file with unemployment data
+d3.csv("vic_LGA_unemployment.csv").then(function(data) {
+    // Create a lookup map for unemployment data by LGA name
+    var unemploymentByLGA = {};
+    data.forEach(function(d) {
+        unemploymentByLGA[d.LGA] = +d.unemployed;
+    });
+
+    // Load the GeoJSON file for Victorian LGAs
+    d3.json("https://raw.githubusercontent.com/QQQduluduluQQQ/j20033237/refs/heads/main/LGA_VIC.json").then(function(json) {
+        // Merge the CSV data with the GeoJSON data
+        json.features.forEach(function(feature) {
+            var lgaName = feature.properties.LGA_name;
+            feature.properties.unemployed = unemploymentByLGA[lgaName] || 0;
+        });
+
+        // Set up the color scale based on the unemployment range in the data
+        var color = d3.scaleQuantize()
+            .domain([0, d3.max(data, d => +d.unemployed)]) // Dynamically set the domain based on data values
+            .range(d3.schemePurples[9]); // Using a 9-step purple color scheme
+
+        // Bind the GeoJSON data and create the map
+        svg.selectAll("path")
+            .data(json.features)
+            .enter()
+            .append("path")
+            .attr("d", path)
+            .style("fill", function(d) {
+                var unemployed = d.properties.unemployed;
+                return unemployed ? color(unemployed) : "#ccc"; // Default color if no data
+            })
+            .attr("stroke", "#000")
+            .attr("stroke-width", 0.5);
+
+        // Load the CSV file with city data
+        d3.csv("VIC_city.csv").then(function(cityData) {
+            // Add circles for each city/town
+            svg.selectAll("circle")
+                .data(cityData)
+                .enter()
+                .append("circle")
+                .attr("cx", function(d) {
+                    return projection([+d.lon, +d.lat])[0];
+                })
+                .attr("cy", function(d) {
+                    return projection([+d.lon, +d.lat])[1];
+                })
+                .attr("r", 3) // Radius of the circle
+                .style("fill", "red")
+                .style("opacity", 0.8);
+        }).catch(function(error) {
+            console.error("Error loading the city CSV file:", error);
+        });
+
+    }).catch(function(error) {
+        console.error("Error loading the GeoJSON file:", error);
+    });
+}).catch(function(error) {
+    console.error("Error loading the CSV file:", error);
+});
