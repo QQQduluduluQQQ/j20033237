@@ -1,0 +1,81 @@
+// Set the dimensions of the SVG canvas
+var w = 800;
+var h = 400;
+var padding = 50;
+
+// Create the SVG element
+var svg = d3.select("#chart")
+    .append("svg")
+    .attr("width", w)
+    .attr("height", h);
+
+// Load the CSV data
+d3.csv("Unemployment_78-95.csv").then(function(data) {
+    // Parse the data and create date objects
+    data.forEach(function(d) {
+        d.date = new Date(+d.year, +d.month - 1);
+        d.number = +d.number;
+    });
+
+    // Set up the scales
+    var xScale = d3.scaleTime()
+        .domain([d3.min(data, d => d.date), d3.max(data, d => d.date)])
+        .range([padding, w - padding]);
+
+    var yScale = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.number)])
+        .range([h - padding, padding]);
+
+    // Create the area generator
+    var area = d3.area()
+        .x(d => xScale(d.date))
+        .y0(yScale(0))
+        .y1(d => yScale(d.number));
+
+    // Create the line generator
+    var line = d3.line()
+        .x(d => xScale(d.date))
+        .y(d => yScale(d.number));
+
+    // Append the area path
+    svg.append("path")
+        .datum(data)
+        .attr("class", "area")
+        .attr("d", area);
+
+    // Append the line path for clarity
+    svg.append("path")
+        .datum(data)
+        .attr("class", "line")
+        .attr("d", line);
+
+    // Add the x-axis
+    var xAxis = d3.axisBottom(xScale).ticks(10);
+    svg.append("g")
+        .attr("transform", "translate(0," + (h - padding) + ")")
+        .call(xAxis);
+
+    // Add the y-axis
+    var yAxis = d3.axisLeft(yScale).ticks(10);
+    svg.append("g")
+        .attr("transform", "translate(" + padding + ",0)")
+        .call(yAxis);
+
+    // Add a horizontal line for "Half a million unemployed"
+    svg.append("line")
+        .attr("class", "line halfMilMark")
+        .attr("x1", padding)
+        .attr("y1", yScale(500000))
+        .attr("x2", w - padding)
+        .attr("y2", yScale(500000));
+
+    // Add a label for the horizontal line
+    svg.append("text")
+        .attr("class", "halfMilLabel")
+        .attr("x", padding + 10)
+        .attr("y", yScale(500000) - 7)
+        .text("Half a million unemployed");
+
+}).catch(function(error) {
+    console.error("Error loading the CSV data:", error);
+});

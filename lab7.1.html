@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unemployment Area Chart</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="lab7.1.json" defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .line {
+            fill: none;
+            stroke: slategrey;
+            stroke-width: 0.5;
+        }
+        .area {
+            fill: lightsteelblue;
+            opacity: 0.7;
+        }
+        .halfMilLabel {
+            fill: red;
+            font-size: 12px;
+        }
+        .line.halfMilMark {
+            stroke: red;
+            stroke-dasharray: 4;
+        }
+    </style>
+</head>
+<body>
+    <button class="button-1" onclick="window.location.href='homepage.html'">Home</button>
+    <button class="button-1" onclick="window.location.href='lab7.1.html'">Lab 7.1</button>
+    <button class="button-1" onclick="window.location.href='lab7-2.html'">Lab 7.2</button>
+    <button class="button-1" onclick="window.location.href='lab7-3.html'">Lab 7.3</button>
+    <br>
+    <h1>Number of Unemployed in Australia</h1>
+    <div id="chart"></div>
+    <footer style="color:grey; margin-top: 20px;">
+        COS30045 Data Visualisation <br> Cheong Zi Shan
+    </footer>
+</body>
+</html>

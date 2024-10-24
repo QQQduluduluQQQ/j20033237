@@ -1,0 +1,75 @@
+// Set up SVG dimensions
+const w = 300;
+const h = 300;
+
+// Sample dataset
+const dataset = [
+    { apples: 5, oranges: 10, grapes: 22 },
+    { apples: 4, oranges: 12, grapes: 28 },
+    { apples: 2, oranges: 19, grapes: 32 },
+    { apples: 7, oranges: 23, grapes: 35 },
+    { apples: 23, oranges: 17, grapes: 43 }
+];
+
+// Stack the data
+const keys = ["apples", "oranges", "grapes"];
+const stack = d3.stack().keys(keys);
+const series = stack(dataset);
+
+// Set up scales
+const xScale = d3.scaleBand()
+    .domain(d3.range(dataset.length))
+    .range([0, w])
+    .padding(0.1);
+
+const yScale = d3.scaleLinear()
+    .domain([0, d3.max(dataset, d => d.apples + d.oranges + d.grapes)])
+    .range([h, 0]);
+
+// Set up color scale with specific colors
+const color = d3.scaleOrdinal()
+    .domain(keys)
+    .range(["#1f77b4", "#ff7f0e", "#2ca02c"]); // Blue for apples, Orange for oranges, Green for grapes
+
+// Select the SVG and append groups
+const svg = d3.select("svg");
+
+const groups = svg.selectAll("g")
+    .data(series)
+    .enter()
+    .append("g")
+    .style("fill", (d, i) => color(keys[i]));
+
+// Draw the rectangles
+groups.selectAll("rect")
+    .data(d => d)
+    .enter()
+    .append("rect")
+    .attr("x", (d, i) => xScale(i))
+    .attr("y", d => yScale(d[1]))
+    .attr("height", d => yScale(d[0]) - yScale(d[1]))
+    .attr("width", xScale.bandwidth());
+
+// Add legend
+const legendSvg = d3.select("#legend");
+const legendKeys = keys;
+
+legendSvg.selectAll("mydots")
+    .data(legendKeys)
+    .enter()
+    .append("circle")
+    .attr("cx", 10)
+    .attr("cy", (d, i) => 10 + i * 25)
+    .attr("r", 7)
+    .style("fill", d => color(d));
+
+legendSvg.selectAll("mylabels")
+    .data(legendKeys)
+    .enter()
+    .append("text")
+    .attr("x", 30)
+    .attr("y", (d, i) => 10 + i * 25)
+    .style("fill", d => color(d))
+    .text(d => d)
+    .attr("text-anchor", "left")
+    .style("alignment-baseline", "middle");

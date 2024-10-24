@@ -1,0 +1,50 @@
+// Set up the SVG canvas dimensions
+var width = 300;
+var height = 300;
+var radius = Math.min(width, height) / 2;
+
+// Create the SVG element
+var svg = d3.select("#chart")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+// Data for the pie chart
+var data = [5, 10, 20, 25, 45, 6];
+
+// Generate the pie chart angles
+var pie = d3.pie();
+
+// Set up the arc generator with outer and inner radii
+var arc = d3.arc()
+    .outerRadius(radius)
+    .innerRadius(50); // Set this to a value greater than 0 for a donut chart
+
+// Set up the color scale
+var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+// Bind data and create one path per pie slice
+var arcs = svg.selectAll("g.arc")
+    .data(pie(data))
+    .enter()
+    .append("g")
+    .attr("class", "arc");
+
+// Append the path elements for each arc
+arcs.append("path")
+    .attr("fill", function(d, i) {
+        return color(i);
+    })
+    .attr("d", arc);
+
+// Add text labels for each slice
+arcs.append("text")
+    .attr("transform", function(d) {
+        return "translate(" + arc.centroid(d) + ")";
+    })
+    .attr("text-anchor", "middle")
+    .text(function(d) {
+        return d.data; // Display the value of each slice
+    });
